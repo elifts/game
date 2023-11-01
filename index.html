@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player vs Bot Game</title>
+    <title>Player Swap Game with Bot and Delay</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,39 +20,75 @@
 </head>
 <body>
     <div id="game-container">
-        <h1>Player vs Bot Game</h1>
-        <label>
-            <input type="checkbox" id="bot-mode-checkbox">
-            Bot Mode
-        </label>
+        <h1>Player Swap Game with Bot</h1>
         <p>Current Player: <span id="current-player">Player 1</span></p>
         <p>Current Value: <span id="current-value">0</span></p>
         <p>Instructions: Add a number between 1 and 4 to the current value. Try to avoid going over 10!</p>
         <input type="number" id="number-input" min="1" max="4">
         <button id="add-button">Add</button>
+        <button id="toggle-bot-button">Toggle Bot Mode</button>
         <p id="result"></p>
     </div>
 
     <script>
         let currentPlayer = 1;
         let x = 0;
-        let isBotMode = false;
+        let botMode = false;
 
         const currentPlayerElement = document.getElementById('current-player');
         const currentValueElement = document.getElementById('current-value');
         const numberInput = document.getElementById('number-input');
         const addButton = document.getElementById('add-button');
+        const toggleBotButton = document.getElementById('toggle-bot-button');
         const resultElement = document.getElementById('result');
-        const botModeCheckbox = document.getElementById('bot-mode-checkbox');
 
-        botModeCheckbox.addEventListener('change', () => {
-            isBotMode = botModeCheckbox.checked;
-            if (isBotMode) {
-                currentPlayerElement.textContent = 'Bot';
+        toggleBotButton.addEventListener('click', () => {
+            botMode = !botMode;
+            if (botMode) {
+                toggleBotButton.textContent = 'Bot Mode: On';
             } else {
-                currentPlayerElement.textContent = `Player ${currentPlayer}`;
+                toggleBotButton.textContent = 'Bot Mode: Off';
             }
         });
+
+        function botMove() {
+            let botNumber;
+            switch (parseInt(numberInput.value)) {
+                case 1:
+                    botNumber = 4;
+                    break;
+                case 2:
+                    botNumber = 3;
+                    break;
+                case 3:
+                    botNumber = 2;
+                    break;
+                case 4:
+                    botNumber = 1;
+                    break;
+                case 6:
+                    botNumber = 4;
+                    break;
+                case 7:
+                    botNumber = 3;
+                    break;
+                case 8:
+                    botNumber = 2;
+                    break;
+                case 9:
+                    botNumber = 1;
+                    break;
+                default:
+                    // The bot's behavior for other player inputs.
+                    botNumber = 1;
+            }
+            setTimeout(() => {
+                x += botNumber;
+                currentValueElement.textContent = x;
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                currentPlayerElement.textContent = `Player ${currentPlayer}`;
+            }, 1000);
+        }
 
         addButton.addEventListener('click', () => {
             const numberToAdd = parseInt(numberInput.value);
@@ -61,22 +97,16 @@
                 currentValueElement.textContent = x;
 
                 if (x > 10) {
-                    if (isBotMode) {
-                        resultElement.textContent = 'Bot lost! It went over 10.';
-                    } else {
-                        resultElement.textContent = `Player ${currentPlayer} lost! They went over 10.`;
-                    }
+                    resultElement.textContent = `Player ${currentPlayer} lost! They went over 10.`;
                     addButton.disabled = true;
                     numberInput.disabled = true;
                 } else {
-                    if (isBotMode) {
-                        const botNumber = getBotMove(x);
-                        setTimeout(() => {
-                            simulateBotMove(botNumber);
-                        }, 1000);
-                    } else {
-                        currentPlayer = currentPlayer === 1 ? 2 : 1;
-                        currentPlayerElement.textContent = `Player ${currentPlayer}`;
+                    // Switch players
+                    currentPlayer = currentPlayer === 1 ? 2 : 1;
+                    currentPlayerElement.textContent = `Player ${currentPlayer}`;
+
+                    if (botMode) {
+                        botMove();
                     }
                 }
             } else {
@@ -85,23 +115,6 @@
 
             numberInput.value = '';
         });
-
-        function simulateBotMove(botNumber) {
-            numberInput.value = botNumber;
-            addButton.click();
-        }
-
-        function getBotMove(currentValue) {
-            // Bot behavior based on your rule
-            if (currentValue === 1 || currentValue === 2 || currentValue === 3 || currentValue === 4) {
-                return 5;
-            } else if (currentValue === 6 || currentValue === 7 || currentValue === 8 || currentValue === 9) {
-                return 10;
-            } else {
-                // Default behavior: add a random number between 1 and 4
-                return Math.floor(Math.random() * 4) + 1;
-            }
-        }
     </script>
 </body>
 </html>
