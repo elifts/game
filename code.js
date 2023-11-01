@@ -9,7 +9,7 @@ const how = document.getElementById('how');
 bot.addEventListener('click', function () {
     alert('bot Clicked');
 });
-play.addEventListener('click', function () {
+player.addEventListener('click', function () {
     alert('player Clicked');
 });
 how.addEventListener('click', function () {
