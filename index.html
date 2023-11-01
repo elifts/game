@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Game</title>
+    <title>Player vs Bot Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,24 +20,40 @@
 </head>
 <body>
     <div id="game-container">
-        <h1>Number Game</h1>
+        <h1>Player vs Bot Game</h1>
+        <label>
+            <input type="checkbox" id="bot-mode-checkbox">
+            Bot Mode
+        </label>
+        <p>Current Player: <span id="current-player">Player 1</span></p>
         <p>Current Value: <span id="current-value">0</span></p>
         <p>Instructions: Add a number between 1 and 4 to the current value. Try to avoid going over 10!</p>
         <input type="number" id="number-input" min="1" max="4">
         <button id="add-button">Add</button>
-        <button id="swap-player">swap player</button>
         <p id="result"></p>
     </div>
 
     <script>
+        let currentPlayer = 1;
         let x = 0;
+        let isBotMode = false;
 
+        const currentPlayerElement = document.getElementById('current-player');
         const currentValueElement = document.getElementById('current-value');
         const numberInput = document.getElementById('number-input');
         const addButton = document.getElementById('add-button');
-        const swap = document.getElementById('swap-player');
         const resultElement = document.getElementById('result');
-        let activeplayer = 1;
+        const botModeCheckbox = document.getElementById('bot-mode-checkbox');
+
+        botModeCheckbox.addEventListener('change', () => {
+            isBotMode = botModeCheckbox.checked;
+            if (isBotMode) {
+                currentPlayerElement.textContent = 'Bot';
+            } else {
+                currentPlayerElement.textContent = `Player ${currentPlayer}`;
+            }
+        });
+
         addButton.addEventListener('click', () => {
             const numberToAdd = parseInt(numberInput.value);
             if (numberToAdd >= 1 && numberToAdd <= 4) {
@@ -45,9 +61,23 @@
                 currentValueElement.textContent = x;
 
                 if (x > 10) {
-                    resultElement.textContent = 'You lost! You went over 10.';
+                    if (isBotMode) {
+                        resultElement.textContent = 'Bot lost! It went over 10.';
+                    } else {
+                        resultElement.textContent = `Player ${currentPlayer} lost! They went over 10.`;
+                    }
                     addButton.disabled = true;
                     numberInput.disabled = true;
+                } else {
+                    if (isBotMode) {
+                        const botNumber = getBotMove(x);
+                        setTimeout(() => {
+                            simulateBotMove(botNumber);
+                        }, 1000);
+                    } else {
+                        currentPlayer = currentPlayer === 1 ? 2 : 1;
+                        currentPlayerElement.textContent = `Player ${currentPlayer}`;
+                    }
                 }
             } else {
                 resultElement.textContent = 'Please enter a number between 1 and 4.';
@@ -55,13 +85,23 @@
 
             numberInput.value = '';
         });
-        swap.addEventListener('click', () => {
-            if (activeplayer == 1) {
-                activeplayer = 2;
-            }else{
-                activeplayer = 1;
+
+        function simulateBotMove(botNumber) {
+            numberInput.value = botNumber;
+            addButton.click();
+        }
+
+        function getBotMove(currentValue) {
+            // Bot behavior based on your rule
+            if (currentValue === 1 || currentValue === 2 || currentValue === 3 || currentValue === 4) {
+                return 5;
+            } else if (currentValue === 6 || currentValue === 7 || currentValue === 8 || currentValue === 9) {
+                return 10;
+            } else {
+                // Default behavior: add a random number between 1 and 4
+                return Math.floor(Math.random() * 4) + 1;
             }
-        })
+        }
     </script>
 </body>
 </html>
