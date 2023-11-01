@@ -2,7 +2,7 @@
 
 // Get a reference to the button by its ID
 const bot = document.getElementById('bot');
-const player = document.getElementById('player');
+const player = document.getElementById('play');
 const how = document.getElementById('how');
 
 // Add a click event listener to the button
